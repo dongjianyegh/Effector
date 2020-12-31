@@ -18,6 +18,7 @@ import android.view.ViewParent;
 import com.dongjianye.effector.internal.BlendManager;
 import com.dongjianye.effector.internal.Blender;
 import com.dongjianye.effector.internal.IEffector;
+import com.dongjianye.effector.internal.PathUtil;
 
 /**
  * @author dongjianye on 12/31/20
@@ -46,29 +47,30 @@ public class OutlineEffector extends IEffector {
     private final ViewGroup mDrawTargetView;
     private final View mOutlineTargetView;
 
-    public OutlineEffector(ViewGroup drawTargetView, View outlineTargetView) {
+    public OutlineEffector(ViewGroup drawTargetView, View targetView) {
         mDrawTargetView = drawTargetView;
-        mOutlineTargetView = outlineTargetView;
+        mOutlineTargetView = targetView;
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(-65536);
         paint.setStrokeWidth(10.0f);
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
         mPaint = paint;
-        mColors = new int[]{mDrawTargetView.f3583d.c(), mDrawTargetView.f3583d.c()};
+        mColors = new int[]{0xFFFF0000, 0xFF0000FF};
     }
 
-    private final Point getParentPosition() {
+    private Point getParentPosition() {
         final View view = this.mOutlineTargetView;
-        if (view instanceof DummyEffectKeyView) {
-            return new Point();
-        }
+//        if (view instanceof DummyEffectKeyView) {
+//            return new Point();
+//        }
         ViewParent parent = view.getParent();
         if (parent != null) {
             return new Point(((ViewGroup) parent).getLeft(), ((ViewGroup) parent).getTop());
+        } else {
+            return null;
         }
-        throw new u("null cannot be cast to non-null type android.view.ViewGroup");
     }
 
     public final ViewGroup getDrawTargetView() {
@@ -76,11 +78,11 @@ public class OutlineEffector extends IEffector {
     }
 
     @Override // b.c.a.b.f.d.d
-    public void onDown(float f2, float f3) {
-        float dimension = this.mDrawTargetView.getResources().getDimension(R.dimen.honey_tea_corner_radius);
+    public void onDown(final float touchX, final float touchY) {
+        float dimension = 32;
         Point position = getParentPosition();
 
-        this.mPath.addRoundRect(
+        mPath.addRoundRect(
                 (float) (position.x + this.mOutlineTargetView.getLeft()),
                 (float) (position.y + this.mOutlineTargetView.getTop()),
                 (float) (position.x + this.mOutlineTargetView.getRight()),
@@ -88,14 +90,14 @@ public class OutlineEffector extends IEffector {
                 dimension, dimension,
                 Path.Direction.CW);
 
-        this.mPathMeasure.setPath(this.mPath, false);
-        this.mPaint.setShader(new LinearGradient(0.0f, 0.0f, 0.0f, (float) this.mDrawTargetView.getWidth(), this.mColors, (float[]) null, Shader.TileMode.CLAMP));
+        mPathMeasure.setPath(mPath, false);
+        mPaint.setShader(new LinearGradient(0.0f, 0.0f, mDrawTargetView.getWidth(), mDrawTargetView.getHeight(), this.mColors, null, Shader.TileMode.CLAMP));
 
         final OutlineBlender blender = new OutlineBlender();
 
-        ValueAnimator ofFloat = ValueAnimator.ofFloat(0.0f, this.mPathMeasure.getLength());
+        ValueAnimator ofFloat = ValueAnimator.ofFloat(0.0f, mPathMeasure.getLength());
         ofFloat.setDuration(1000L);
-        ofFloat.setInterpolator(a.sInstance.getPathInterpolator());
+        ofFloat.setInterpolator(PathUtil.getPathInterpolator());
         ofFloat.addListener(new AnimatorListenerAdapter() {
 
             @Override
@@ -131,7 +133,7 @@ public class OutlineEffector extends IEffector {
         public void blend(Canvas canvas) {
             mMatrix.reset();
             mMatrix.setRotate(360 * mAnimatedFraction);
-
+            mMatrix.setTranslate(100, 200);
             mPaint.getShader().setLocalMatrix(mMatrix);
             mPaint.setAlpha((int) (255 * (1 - mAnimatedFraction)));
             mPaint.setStrokeWidth(200 * mAnimatedFraction);
