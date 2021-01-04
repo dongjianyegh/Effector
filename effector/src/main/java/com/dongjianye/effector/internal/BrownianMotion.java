@@ -17,7 +17,6 @@ public class BrownianMotion {
 
     private final float[] mPositionSequence = new float[6];
 
-    /* renamed from: f  reason: collision with root package name */
     private final Vector3 mPosition = new Vector3(0.0f, 0.0f, 0.0f);
     private final FrameRateCounter mFrameRate = new FrameRateCounter();
 

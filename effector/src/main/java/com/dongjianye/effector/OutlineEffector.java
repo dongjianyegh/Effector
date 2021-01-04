@@ -17,6 +17,7 @@ import android.view.ViewParent;
 
 import com.dongjianye.effector.internal.BlendManager;
 import com.dongjianye.effector.internal.Blender;
+import com.dongjianye.effector.internal.DpUtils;
 import com.dongjianye.effector.internal.IEffector;
 import com.dongjianye.effector.internal.PathUtil;
 
@@ -24,23 +25,14 @@ import com.dongjianye.effector.internal.PathUtil;
  * @author dongjianye on 12/31/20
  */
 public class OutlineEffector extends IEffector {
-
-    /* renamed from: a */
     private float mAnimatedValue;
-
-    /* renamed from: b */
     private float mAnimatedFraction;
 
-    /* renamed from: c */
     private final Path mPath = new Path();
-
-    /* renamed from: d */
     private final Path mAnimatedPath = new Path();
 
-    /* renamed from: e */
     private final PathMeasure mPathMeasure = new PathMeasure();
 
-    /* renamed from: f */
     private final Matrix mMatrix = new Matrix();
     private final Paint mPaint;
     private final int[] mColors;
@@ -62,9 +54,6 @@ public class OutlineEffector extends IEffector {
 
     private Point getParentPosition() {
         final View view = this.mOutlineTargetView;
-//        if (view instanceof DummyEffectKeyView) {
-//            return new Point();
-//        }
         ViewParent parent = view.getParent();
         if (parent != null) {
             return new Point(((ViewGroup) parent).getLeft(), ((ViewGroup) parent).getTop());
@@ -77,9 +66,9 @@ public class OutlineEffector extends IEffector {
         return mDrawTargetView;
     }
 
-    @Override // b.c.a.b.f.d.d
+    @Override
     public void onDown(final float touchX, final float touchY) {
-        float dimension = 32;
+        float dimension = DpUtils.dp2pixel(8);
         Point position = getParentPosition();
 
         mPath.addRoundRect(
@@ -117,7 +106,7 @@ public class OutlineEffector extends IEffector {
             public void onAnimationUpdate(ValueAnimator animation) {
                 Object animatedValue = animation.getAnimatedValue();
                 if (animatedValue != null) {
-                    mAnimatedValue = ((Float) animatedValue).floatValue();
+                    mAnimatedValue = ((Float) animatedValue);
                     mAnimatedFraction = animation.getAnimatedFraction();
                     getDrawTargetView().invalidate();
                     return;
@@ -133,8 +122,8 @@ public class OutlineEffector extends IEffector {
         public void blend(Canvas canvas) {
             mMatrix.reset();
             mMatrix.setRotate(360 * mAnimatedFraction);
-            mMatrix.setTranslate(100, 200);
             mPaint.getShader().setLocalMatrix(mMatrix);
+
             mPaint.setAlpha((int) (255 * (1 - mAnimatedFraction)));
             mPaint.setStrokeWidth(200 * mAnimatedFraction);
 

@@ -15,4 +15,8 @@ public class RandomUtil {
     public static int random(int start, int end) {
         return start + sRandom.nextInt(end - start + 1);
     }
+
+    public static int nextInt(int value) {
+        return sRandom.nextInt(value);
+    }
 }

@@ -7,7 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.dongjianye.effector.BlobEffector;
+import com.dongjianye.effector.BlobSpreadEffector;
 import com.dongjianye.effector.OutlineEffector;
+import com.dongjianye.effector.RingSpreadEffector;
+import com.dongjianye.effector.SparkEffector;
+import com.dongjianye.effector.SparkSpinEffector;
 
 import androidx.annotation.Nullable;
 
@@ -44,7 +49,19 @@ public class KeyView extends TextView {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                new OutlineEffector((ViewGroup) getParent(), this).onDown(event.getX(), event.getY());
+                if ("A".equals(getText())) {
+                    new OutlineEffector((ViewGroup) getParent(), this).onDown(event.getX(), event.getY());
+                } else if ("B".equals(getText())) {
+                    new RingSpreadEffector((ViewGroup) getParent(), this).onDown(event.getX(), event.getY());
+                } else if ("C".equals(getText())) {
+                    new SparkEffector((ViewGroup) getParent(), this).onDown(event.getX(), event.getY());
+                } else if ("D".equals(getText())) {
+                    new SparkSpinEffector((ViewGroup) getParent(), this).onDown(event.getX(), event.getY());
+                } else if ("E".equals(getText())) {
+                    new BlobEffector((ViewGroup) getParent(), this, 0, 0, 6).onDown(event.getX(), event.getY());
+                } else if ("F".equals(getText())) {
+                    new BlobSpreadEffector((ViewGroup) getParent(), this, 0, 0, 6).onDown(event.getX(), event.getY());
+                }
                 break;
             default:
                 break;
